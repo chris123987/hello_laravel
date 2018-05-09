@@ -20,4 +20,10 @@ Route::get('/help','Test\StaticPagesController@help')->name('help');
 
 Route::get('/signup','Test\UserController@create')->name('signup');
 
+//Route::resource('users','Test\UserController');
+Route::get('/users/{user}','Test\UserController@show')->name('users.show');
+Route::any('/store','Test\UserController@store')->name('store');
+
+
+
 
