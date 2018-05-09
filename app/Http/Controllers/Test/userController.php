@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Auth;
 
 class userController extends Controller
 {
@@ -28,6 +29,7 @@ class userController extends Controller
             'email' =>$request->email,
             'password' =>bcrypt($request->password),
         ]);
+        Auth::login($user);
         session()->flash('success','欢迎，您将在这里开启一段新的旅程~');
         return redirect()->route('users.show',[$user]);
     }

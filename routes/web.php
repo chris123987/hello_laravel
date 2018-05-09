@@ -24,6 +24,10 @@ Route::get('/signup','Test\UserController@create')->name('signup');
 Route::get('/users/{user}','Test\UserController@show')->name('users.show');
 Route::any('/store','Test\UserController@store')->name('store');
 
+//登录-退出
+Route::get('login','Test\SessionController@create')->name('login');
+Route::post('login','Test\SessionController@store')->name('login');
+Route::delete('logout','Test\SessionController@destroy')->name('logout');
 
 
 
