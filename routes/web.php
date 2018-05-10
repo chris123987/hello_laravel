@@ -38,5 +38,6 @@ Route::get('/index','Test\UserController@index')->name('users.index');
 
 Route::delete('/destroy/{user}','Test\UserController@destroy')->name('users.destroy');
 
-
+//邮件验证
+Route::get('signup/confirm/{token}', 'Test\UserController@confirmEmail')->name('confirm_email');
 

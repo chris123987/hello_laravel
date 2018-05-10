@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class userController extends Controller
 {
@@ -13,7 +14,7 @@ class userController extends Controller
     {
         //除了 except 数组中指定的动作，其他的动作都必须登录以后才能操作
         $this->middleware('auth',[
-            'except' =>['show','create','store','index']
+            'except' =>['show','create','store','index','confirmEmail']
         ]);
 
        //使用 Auth 中间件提供的 guest 选项，用于指定一些只允许未登录用户访问的动作
@@ -21,6 +22,21 @@ class userController extends Controller
             'only' => ['create']
         ]);
     }
+
+    public function confirmEmail($token){
+        // firstOrfail方法来取出第一个用户,在查询不到指定用户时将返回一个 404 响应
+        $user = User::where('activation_token',$token)->firstOrfail();
+
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success','恭喜你，激活成功!');
+        return redirect()->route('users.show',[$user]);
+
+    }
+
 
     public function index(){
         $users = User::paginate(10);
@@ -47,10 +63,29 @@ class userController extends Controller
             'email' =>$request->email,
             'password' =>bcrypt($request->password),
         ]);
-        Auth::login($user);
-        session()->flash('success','欢迎，您将在这里开启一段新的旅程~');
-        return redirect()->route('users.show',[$user]);
+//        Auth::login($user);//注册成功直接登录方法
+
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success','验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
+//        return redirect()->route('users.show',[$user]);
     }
+
+    //发送邮件
+    protected function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'aufree@yousails.com';
+        $name = 'Aufree';
+        $to = $user->email;
+        $subject = "感谢注册 Sample 应用！请确认你的邮箱。";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
 
     //用户编辑
     public function edit(User $user){
