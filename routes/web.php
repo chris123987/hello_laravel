@@ -29,5 +29,14 @@ Route::get('login','Test\SessionController@create')->name('login');
 Route::post('login','Test\SessionController@store')->name('login');
 Route::delete('logout','Test\SessionController@destroy')->name('logout');
 
+//编辑表单
+Route::get('/users/{user}/edit','Test\UserController@edit')->name('users.edit');
+Route::any('/update/{user}','Test\UserController@update')->name('users.update');
+
+//用户列表
+Route::get('/index','Test\UserController@index')->name('users.index');
+
+Route::delete('/destroy/{user}','Test\UserController@destroy')->name('users.destroy');
+
 
 
